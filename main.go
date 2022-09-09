@@ -1,14 +1,14 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
-	// This controls the maxprocs environment variable in container runtimes.
-	// see https://martin.baillie.id/wrote/gotchas-in-the-go-network-packages-defaults/#bonus-gomaxprocs-containers-and-the-cfs
-	_ "go.uber.org/automaxprocs"
+	"github.com/mitchellh/go-homedir"
 )
 
 func main() {
@@ -19,14 +19,25 @@ func main() {
 }
 
 func run() error {
+	home, err := homedir.Dir()
+	if err != nil {
+		return err
+	}
+
+	var command string
+	var krewfileLocation string
+	flag.StringVar(&command, "command", "krew", "command to be used for krew")
+	flag.StringVar(&krewfileLocation, "file", filepath.Join(home, ".krewfile"), "location of the krewfile")
+	flag.Parse()
+
 	fmt.Println("getting installed plugins")
-	krewList, err := exec.Command("krew", "list").Output()
+	krewList, err := krewCommand(command, "list").Output()
 	if err != nil {
 		return err
 	}
 
 	fmt.Println("reading krewfile")
-	krewfile, err := os.ReadFile("./krewfile")
+	krewfile, err := os.ReadFile(krewfileLocation)
 	if err != nil {
 		return err
 	}
@@ -49,25 +60,25 @@ func run() error {
 	// wantedPlugins are the ones that need to be installed
 	for plugin := range installedPlugins {
 		fmt.Printf("removing %s\n", plugin)
-		if err := exec.Command("krew", "uninstall", plugin).Run(); err != nil {
+		if err := krewCommand(command, "uninstall", plugin).Run(); err != nil {
 			return err
 		}
 	}
 
 	fmt.Println("updating krew")
-	if err := exec.Command("krew", "update").Run(); err != nil {
+	if err := krewCommand(command, "update").Run(); err != nil {
 		return err
 	}
 
 	for plugin := range wantedPlugins {
 		fmt.Printf("installing %s\n", plugin)
-		if err := exec.Command("krew", "install", plugin).Run(); err != nil {
+		if err := krewCommand(command, "install", plugin).Run(); err != nil {
 			return err
 		}
 	}
 
 	fmt.Println("upgrading plugins")
-	if err := exec.Command("krew", "upgrade").Run(); err != nil {
+	if err := krewCommand(command, "upgrade").Run(); err != nil {
 		return err
 	}
 
@@ -83,4 +94,9 @@ func readBytesToPluginMap(input []byte) map[string]struct{} {
 	}
 
 	return output
+}
+
+func krewCommand(krewCommand string, args ...string) *exec.Cmd {
+	fullCommand := append(strings.Split(krewCommand, " "), args...)
+	return exec.Command(fullCommand[0], fullCommand[1:]...)
 }
