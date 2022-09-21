@@ -89,7 +89,7 @@ func readBytesToPluginMap(input []byte) map[string]struct{} {
 	output := map[string]struct{}{}
 	for _, line := range strings.Split(string(input), "\n") {
 		if line != "" {
-			output[line] = struct{}{}
+			output[strings.TrimSpace(line)] = struct{}{}
 		}
 	}
 
