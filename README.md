@@ -4,6 +4,10 @@
 
 krewfile is just like [Brewfile (brew bundle)](https://github.com/Homebrew/homebrew-bundle) or [Gemfiles](https://bundler.io/man/gemfile.5.html) but for the [krew](https://github.com/kubernetes-sigs/krew) kubernetes plugin manager.
 
+## Demo
+
+![krewfile demo](docs/term-animation.svg)
+
 ## Usage
 
 Define a krewfile like the following at `~/.krewfile`:
