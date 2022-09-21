@@ -1,4 +1,4 @@
-module krewfile
+module github.com/brumhard/krewfile
 
 go 1.19
 
