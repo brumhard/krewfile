@@ -7,13 +7,14 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
-        version = "0.1.1";
         name = "krewfile";
+        version = "0.1.1";
+        pkgs = import nixpkgs { inherit system; };
       in
       rec {
         packages = {
-          default = pkgs.buildGoModule {
+          default = packages.${name};
+          ${name} = pkgs.buildGoModule {
             pname = name;
             version = version;
             vendorSha256 = "sha256-Z0H01Ts6RlBFwKgx+9YYAd9kT4BkCBL1mvJsRf2ci5I=";
@@ -24,15 +25,6 @@
               homepage = "https://goreleaser.com";
               maintainers = with maintainers; [ brumhard ];
               license = licenses.mit;
-            };
-          };
-          ociImage = pkgs.dockerTools.buildLayeredImage {
-            name = "ghcr.io/brumhard/${name}";
-            tag = version;
-            contents = [ packages.default ];
-            config = {
-              Entrypoint = [ "${packages.default}/bin/${name}" ];
-              Cmd = [ "-help" ];
             };
           };
         };
