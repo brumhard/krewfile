@@ -44,23 +44,8 @@ go install github.com/brumhard/krewfile@latest
 
 ### nix
 
-This repo contains a [`default.nix`](default.nix) file which you can build and include in your overlay.
+This repo contains a [`flake.nix`](flake.nix) file which you can use for example with
 
-The config could for example look like:
-
-```nix
-{ config, pkgs, lib, ... }: {
-  nixpkgs.overlays = [
-    (self: super: {
-      krewfile = self.callPackage (
-        self.fetchFromGitHub {
-          owner = "brumhard";
-          repo = "krewfile";
-          rev = "v0.1.0";
-          sha256 = "sha256-3OWpZTwx8knVkiMAgASavDbKDeOszXfWbKHBHWMkNkU=";
-        }
-      ) {};
-    })
-  ];
-}
+```shell
+nix --experimental-features "nix-command flakes" run github:brumhard/krewfile# -- -help
 ```
