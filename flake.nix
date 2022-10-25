@@ -5,6 +5,11 @@
   };
 
   outputs = { self, nixpkgs, flake-utils }:
+    {
+      overlay = final: prev: {
+        krewfile = self.packages.${prev.system}.default;
+      };
+    } //
     flake-utils.lib.eachDefaultSystem (system:
       let
         name = "krewfile";
