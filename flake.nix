@@ -4,42 +4,44 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+  }:
     {
       overlay = final: prev: {
         krewfile = self.packages.${prev.system}.default;
       };
-    } //
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        name = "krewfile";
-        version = "0.1.1";
-        pkgs = import nixpkgs { inherit system; };
-      in
-      rec {
-        packages = {
-          default = packages.${name};
-          ${name} = pkgs.buildGoModule {
-            pname = name;
-            version = version;
-            vendorSha256 = "sha256-Z0H01Ts6RlBFwKgx+9YYAd9kT4BkCBL1mvJsRf2ci5I=";
-            src = ./.;
+    }
+    // flake-utils.lib.eachDefaultSystem (system: let
+      name = "krewfile";
+      version = "0.2.0";
+      pkgs = import nixpkgs {inherit system;};
+    in rec {
+      packages = {
+        default = packages.${name};
+        ${name} = pkgs.buildGoModule {
+          pname = name;
+          version = version;
+          vendorSha256 = "sha256-Z0H01Ts6RlBFwKgx+9YYAd9kT4BkCBL1mvJsRf2ci5I=";
+          src = ./.;
 
-            meta = with pkgs.lib; {
-              description = "Helper to declaratively manage krew plugins";
-              homepage = "https://goreleaser.com";
-              maintainers = with maintainers; [ brumhard ];
-              license = licenses.mit;
-            };
+          meta = with pkgs.lib; {
+            description = "Helper to declaratively manage krew plugins";
+            homepage = "https://goreleaser.com";
+            maintainers = with maintainers; [brumhard];
+            license = licenses.mit;
           };
         };
+      };
 
-        apps = {
-          default = flake-utils.lib.mkApp {
-            drv = packages.default;
-          };
+      apps = {
+        default = flake-utils.lib.mkApp {
+          drv = packages.default;
         };
+      };
 
-        devShell = import ./shell.nix { inherit pkgs; };
-      });
+      devShell = import ./shell.nix {inherit pkgs;};
+    });
 }

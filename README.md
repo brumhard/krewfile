@@ -47,5 +47,5 @@ go install github.com/brumhard/krewfile@latest
 This repo contains a [`flake.nix`](flake.nix) file which you can use for example with
 
 ```shell
-nix --experimental-features "nix-command flakes" run github:brumhard/krewfile# -- -help
+nix run github:brumhard/krewfile# -- -help
 ```

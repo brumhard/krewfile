@@ -26,8 +26,10 @@ func run() error {
 
 	var command string
 	var krewfileLocation string
+	var upgrade bool
 	flag.StringVar(&command, "command", "krew", "command to be used for krew")
 	flag.StringVar(&krewfileLocation, "file", filepath.Join(home, ".krewfile"), "location of the krewfile")
+	flag.BoolVar(&upgrade, "upgrade", false, "runs krew upgrade after syncing plugins")
 	flag.Parse()
 
 	fmt.Println("getting installed plugins")
@@ -77,9 +79,11 @@ func run() error {
 		}
 	}
 
-	fmt.Println("upgrading plugins")
-	if err := krewCommand(command, "upgrade").Run(); err != nil {
-		return err
+	if upgrade {
+		fmt.Println("upgrading plugins")
+		if err := krewCommand(command, "upgrade").Run(); err != nil {
+			return err
+		}
 	}
 
 	return nil
