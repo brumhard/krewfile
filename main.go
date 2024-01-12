@@ -11,6 +11,8 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
+const commentSymbol = "#"
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "an error occurred: %s\n", err)
@@ -92,8 +94,9 @@ func run() error {
 func readBytesToPluginMap(input []byte) map[string]struct{} {
 	output := map[string]struct{}{}
 	for _, line := range strings.Split(string(input), "\n") {
-		if line != "" {
-			output[strings.TrimSpace(line)] = struct{}{}
+		lineWithComments := strings.SplitN(line, commentSymbol, 2)
+		if plugin := strings.TrimSpace(lineWithComments[0]); plugin != "" {
+			output[plugin] = struct{}{}
 		}
 	}
 

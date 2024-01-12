@@ -16,7 +16,7 @@
     }
     // flake-utils.lib.eachDefaultSystem (system: let
       name = "krewfile";
-      version = "0.2.0";
+      version = "0.3.0";
       pkgs = import nixpkgs {inherit system;};
     in rec {
       packages = {
@@ -24,7 +24,7 @@
         ${name} = pkgs.buildGoModule {
           pname = name;
           version = version;
-          vendorSha256 = "sha256-Z0H01Ts6RlBFwKgx+9YYAd9kT4BkCBL1mvJsRf2ci5I=";
+          vendorHash = "sha256-Z0H01Ts6RlBFwKgx+9YYAd9kT4BkCBL1mvJsRf2ci5I=";
           src = ./.;
 
           meta = with pkgs.lib; {
