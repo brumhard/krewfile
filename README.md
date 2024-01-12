@@ -13,7 +13,8 @@ krewfile is just like [Brewfile (brew bundle)](https://github.com/Homebrew/homeb
 Define a krewfile like the following at `~/.krewfile`:
 
 ```krewfile
-explore
+# this is a comment
+explore # great module
 modify-secret
 neat
 oidc-login
