@@ -29,7 +29,7 @@
 
           meta = with pkgs.lib; {
             description = "Helper to declaratively manage krew plugins";
-            homepage = "https://goreleaser.com";
+            homepage = "https://github.com/brumhard/krewfile";
             maintainers = with maintainers; [brumhard];
             license = licenses.mit;
           };
