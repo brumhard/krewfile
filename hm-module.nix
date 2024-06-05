@@ -56,7 +56,7 @@ in
 
     home.activation.krew = hm.dag.entryAfter [ "writeBoundary" ] ''
       PATH=$PATH:${cfg.krewPackage}/bin
-      run ${finalPackage}/bin/${finalPackage.pname}
+      run ${finalPackage}/bin/${finalPackage.pname} -file ${cfg.path}
     '';
   };
 }
