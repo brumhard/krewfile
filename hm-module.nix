@@ -47,7 +47,6 @@ in
     home.sessionVariables.PATH = "$HOME/.krew/bin:$PATH";
 
     home.activation.krew = hm.dag.entryAfter [ "writeBoundary" ] ''
-      echo $PATH
       PATH="$HOME/.krew/bin:$PATH"
       run ${cfg.krewPackage}/bin/${cfg.krewPackage.pname} update
       run ${finalPackage}/bin/${finalPackage.pname} \
