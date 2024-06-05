@@ -11,7 +11,7 @@ with lib;
 let
   cfg = config.programs.krewfile;
   finalPackage = self.packages.${pkgs.system}.krewfile;
-  krewfileContent = concatStringsSep "\n" cfg.plugins;
+  krewfileContent = pkgs.writeText "krewfile" (concatStringsSep "\n" cfg.plugins);
 in
 {
   options.programs.krewfile = {
@@ -29,16 +29,6 @@ in
       '';
     };
 
-    path = mkOption {
-      type = types.string;
-      default = ".krewfile";
-      defaultText = literalExpression ".krewfile";
-      description = ''
-        Specify the path where the `krewfile` is written.
-        This is relative to the home directory.
-      '';
-    };
-
     plugins = mkOption {
       type = with types; listOf str;
       default = [ ];
@@ -50,13 +40,10 @@ in
 
     home.packages = ([ finalPackage ] ++ optionals cfg.installKrew [ cfg.krewPackage ]);
 
-    home.file = {
-      ${cfg.path}.text = krewfileContent;
-    };
-
     home.activation.krew = hm.dag.entryAfter [ "writeBoundary" ] ''
-      PATH=$PATH:${cfg.krewPackage}/bin
-      run ${finalPackage}/bin/${finalPackage.pname} -file ${cfg.path}
+      run ${finalPackage}/bin/${finalPackage.pname} \
+        -command ${cfg.krewPackage}/bin/${cfg.krewPackage.pname} \
+        -file ${krewfileContent} -upgrade
     '';
   };
 }
