@@ -50,3 +50,40 @@ This repo contains a [`flake.nix`](flake.nix) file which you can use for example
 ```shell
 nix run github:brumhard/krewfile# -- -help
 ```
+
+**Using home-manager module**
+
+If you using flakes to manage your system, add the `krewfile` input as follows:
+
+```nix
+# ...
+inputs.krewfile = {
+  url = "github:brumhard/krewfile";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+```
+
+You can now access the module via `inputs.krewfile.homeManagerModules.krewfile`.
+Assuming a setup with properly configured imports via `home-manager.extraSpecialArgs`, the module can be imported and configured as shown below:
+
+```nix
+{ inputs, pkgs, ... }: {
+  imports [
+    # ...
+    inputs.krewfile.homeManagerModules.krewfile
+  ];
+
+  programs.krewfile = {
+    enable = true;
+    krewPackage = pkgs.krew;
+    plugins = [
+      "explore"
+      "modify-secret"
+      "neat"
+      "oidc-login"
+      "pv-migrate"
+      "stern"
+    ];
+  };
+}
+```
