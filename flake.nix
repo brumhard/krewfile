@@ -13,6 +13,11 @@
       overlay = final: prev: {
         krewfile = self.packages.${prev.system}.default;
       };
+
+      homeManagerModules = {
+        default = self.homeManagerModules.krewfile;
+        krewfile = import ./hm-module.nix self;
+      };
     }
     // flake-utils.lib.eachDefaultSystem (system: let
       name = "krewfile";
