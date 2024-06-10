@@ -53,7 +53,7 @@ nix run github:brumhard/krewfile# -- -help
 
 **Using home-manager module**
 
-If you using flakes to manage your system, add the `krewfile` input as follows:
+If you're using flakes to manage your system, add the `krewfile` input as follows:
 
 ```nix
 # ...
@@ -68,7 +68,7 @@ Assuming a setup with properly configured imports via `home-manager.extraSpecial
 
 ```nix
 { inputs, pkgs, ... }: {
-  imports [
+  imports = [
     # ...
     inputs.krewfile.homeManagerModules.krewfile
   ];
