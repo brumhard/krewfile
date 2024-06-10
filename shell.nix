@@ -1,7 +1,7 @@
 {pkgs ? import <nixpkgs> {}}:
 pkgs.mkShell {
   packages = with pkgs; [
-    go_1_21
+    go
 
     # for terminal gifs
     nodejs

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -35,7 +36,7 @@ func run() error {
 	flag.Parse()
 
 	fmt.Println("getting installed plugins")
-	krewList, err := krewCommand(command, "list").Output()
+	krewList, err := runKrewCommand(command, "list")
 	if err != nil {
 		return err
 	}
@@ -64,26 +65,26 @@ func run() error {
 	// wantedPlugins are the ones that need to be installed
 	for plugin := range installedPlugins {
 		fmt.Printf("removing %s\n", plugin)
-		if err := krewCommand(command, "uninstall", plugin).Run(); err != nil {
+		if _, err := runKrewCommand(command, "uninstall", plugin); err != nil {
 			return err
 		}
 	}
 
 	fmt.Println("updating krew")
-	if err := krewCommand(command, "update").Run(); err != nil {
+	if _, err := runKrewCommand(command, "update"); err != nil {
 		return err
 	}
 
 	for plugin := range wantedPlugins {
 		fmt.Printf("installing %s\n", plugin)
-		if err := krewCommand(command, "install", plugin).Run(); err != nil {
+		if _, err := runKrewCommand(command, "install", plugin); err != nil {
 			return err
 		}
 	}
 
 	if upgrade {
 		fmt.Println("upgrading plugins")
-		if err := krewCommand(command, "upgrade").Run(); err != nil {
+		if _, err := runKrewCommand(command, "upgrade"); err != nil {
 			return err
 		}
 	}
@@ -103,7 +104,15 @@ func readBytesToPluginMap(input []byte) map[string]struct{} {
 	return output
 }
 
-func krewCommand(krewCommand string, args ...string) *exec.Cmd {
+func runKrewCommand(krewCommand string, args ...string) ([]byte, error) {
 	fullCommand := append(strings.Split(krewCommand, " "), args...)
-	return exec.Command(fullCommand[0], fullCommand[1:]...)
+	cmd := exec.Command(fullCommand[0], fullCommand[1:]...)
+	stderr := bytes.Buffer{}
+	cmd.Stderr = &stderr
+
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("krew error:\n%s", stderr.String())
+	}
+	return out, nil
 }
