@@ -43,10 +43,11 @@ in
   config = mkIf cfg.enable {
 
     home.packages = [ finalPackage cfg.krewPackage ];
+    home.extraActivationPath = [ pkgs.git ];
 
     home.sessionVariables.PATH = "$HOME/.krew/bin:$PATH";
 
-    home.activation.krew = hm.dag.entryAfter [ "writeBoundary" ] ''
+    home.activation.krew = hm.dag.entryAfter [ "installPackages" ] ''
       run ${finalPackage}/bin/${finalPackage.pname} \
         -command ${cfg.krewPackage}/bin/${cfg.krewPackage.pname} \
         -file ${krewfileContent} ${args}
