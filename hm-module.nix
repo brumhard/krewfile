@@ -11,7 +11,10 @@ with lib;
 let
   cfg = config.programs.krewfile;
   finalPackage = self.packages.${pkgs.system}.krewfile;
-  krewfileContent = pkgs.writeText "krewfile" (concatStringsSep "\n" cfg.plugins);
+  krewfileContent = pkgs.writeText "krewfile" (
+    (concatStringsSep "\n" (map (key: "index ${key} ${getAttr key cfg.indexes}") (attrNames cfg.indexes))) + "\n\n" + (concatStringsSep "\n" cfg.plugins)
+  );
+
   args = if cfg.upgrade then "-upgrade" else "";
 in
 {
@@ -32,6 +35,13 @@ in
       description = "List of plugins to be installed.";
     };
 
+    indexes = mkOption {
+      type = with types; attrsOf str;
+      default = { };
+      defaultText = ''{ netshoot = "https://github.com/nilic/kubectl-netshoot.git" }'';
+      description = "List of extra indexes to be added, where key is index name, and value is index URL";
+    };
+
     upgrade = mkOption {
       type = types.bool;
       default = false;
@@ -41,7 +51,6 @@ in
   };
 
   config = mkIf cfg.enable {
-
     home.packages = [ finalPackage cfg.krewPackage ];
     home.extraActivationPath = [ pkgs.git ];
 
