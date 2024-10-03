@@ -28,6 +28,12 @@ in
       description = "Krew package to install.";
     };
 
+    krewRoot = mkOption {
+      type = types.path;
+      default = "${config.home.homeDirectory}/.krew";
+      description = "Path where all krew-related files will be installed and stored.";
+    };
+
     plugins = mkOption {
       type = with types; listOf str;
       default = [ ];
@@ -54,9 +60,12 @@ in
     home.packages = [ finalPackage cfg.krewPackage ];
     home.extraActivationPath = [ pkgs.git ];
 
-    home.sessionVariables.PATH = "$HOME/.krew/bin:$PATH";
+    home.sessionVariables.KREW_ROOT = "${cfg.krewRoot}";
+    home.sessionPath = [ "${cfg.krewRoot}/bin" ];
 
     home.activation.krew = hm.dag.entryAfter [ "installPackages" ] ''
+      KREW_ROOT="${cfg.krewRoot}";
+
       run ${finalPackage}/bin/${finalPackage.pname} \
         -command ${cfg.krewPackage}/bin/${cfg.krewPackage.pname} \
         -file ${krewfileContent} ${args}
