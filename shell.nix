@@ -15,6 +15,7 @@ pkgs.mkShell {
         --window=true \
         --width=80
     '')
+    goreleaser
   ];
 
   shellHook = '''';
