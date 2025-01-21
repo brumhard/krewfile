@@ -47,8 +47,12 @@ func run() error {
 	flag.BoolVar(&dryRun, "dry-run", false, "shows only output, doesn't modify anything")
 	flag.Parse()
 
-	fmt.Println("getting installed plugins")
-	krewPluginList, err := runKrewCommand(false, command, "list")
+	fmt.Println("reading krewfile")
+	krewfile, err := os.ReadFile(krewfileLocation)
+	if err != nil {
+		return err
+	}
+	wantedPlugins, wantedIndexes, err := readKrewfile(krewfile)
 	if err != nil {
 		return err
 	}
@@ -58,38 +62,11 @@ func run() error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("reading krewfile")
-	krewfile, err := os.ReadFile(krewfileLocation)
-	if err != nil {
-		return err
-	}
-
-	installedPlugins := readPluginsFromKrew(krewPluginList)
 	installedIndexes := readIndexesFromKrew(krewIndexList)
-	wantedPlugins, wantedIndexes, err := readKrewfile(krewfile)
-	if err != nil {
-		return err
-	}
-
-	// find plugins that are installed but not wanted anymore
-	// find plugins that are not installed but wanted
-	// -> remove all entries from both maps that are in both maps
-
-	for k := range installedPlugins {
-		if _, ok := wantedPlugins[k]; ok {
-			delete(installedPlugins, k)
-			delete(wantedPlugins, k)
-		}
-	}
-
-	// default index is special case, it's always wanted
-	wantedIndexes["default"] = ""
 
 	// find indexes that are installed but not wanted anymore
 	// find indexes that are not installed but wanted
 	// -> remove all entries from both maps that are in both maps
-
 	for k := range installedIndexes {
 		if _, ok := wantedIndexes[k]; ok {
 			delete(installedIndexes, k)
@@ -97,21 +74,22 @@ func run() error {
 		}
 	}
 
-	// now installedPlugins only holds plugins that are not wanted anymore -> to be deleted
-	// wantedPlugins are the ones that need to be installed
-	for plugin := range installedPlugins {
-		fmt.Printf("removing plugin %q\n", plugin)
-		pluginItems := strings.Split(plugin, "/")
-		if _, err := runKrewCommand(dryRun, command, "uninstall", pluginItems[len(pluginItems)-1]); err != nil {
+	// now installedIndexes only holds indexes that are not wanted anymore -> to be deleted
+	// wantedIndexes are the ones that need to be installed
+	for index := range installedIndexes {
+		// default index is special case, it's always wanted
+		if index == "default" {
+			continue
+		}
+		fmt.Printf("removing index %q\n", index)
+		if _, err := runKrewCommand(dryRun, command, "index", "remove", index); err != nil {
 			return err
 		}
 	}
 
-	// now installedIndexes only holds indexes that are not wanted anymore -> to be deleted
-	// wantedIndexes are the ones that need to be installed
-	for index := range installedIndexes {
-		fmt.Printf("removing index %q\n", index)
-		if _, err := runKrewCommand(dryRun, command, "index", "remove", index); err != nil {
+	for index, url := range wantedIndexes {
+		fmt.Printf("adding index %q\n", index)
+		if _, err := runKrewCommand(dryRun, command, "index", "add", index, url); err != nil {
 			return err
 		}
 	}
@@ -121,9 +99,29 @@ func run() error {
 		return err
 	}
 
-	for index, url := range wantedIndexes {
-		fmt.Printf("adding index %q\n", index)
-		if _, err := runKrewCommand(dryRun, command, "index", "add", index, url); err != nil {
+	fmt.Println("getting installed plugins")
+	krewPluginList, err := runKrewCommand(false, command, "list")
+	if err != nil {
+		return err
+	}
+	installedPlugins := readPluginsFromKrew(krewPluginList)
+
+	// find plugins that are installed but not wanted anymore
+	// find plugins that are not installed but wanted
+	// -> remove all entries from both maps that are in both maps
+	for k := range installedPlugins {
+		if _, ok := wantedPlugins[k]; ok {
+			delete(installedPlugins, k)
+			delete(wantedPlugins, k)
+		}
+	}
+
+	// now installedPlugins only holds plugins that are not wanted anymore -> to be deleted
+	// wantedPlugins are the ones that need to be installed
+	for plugin := range installedPlugins {
+		fmt.Printf("removing plugin %q\n", plugin)
+		pluginItems := strings.Split(plugin, "/")
+		if _, err := runKrewCommand(dryRun, command, "uninstall", pluginItems[len(pluginItems)-1]); err != nil {
 			return err
 		}
 	}
