@@ -4,8 +4,6 @@ FROM golang:1.22
 ARG --global BINPATH=/usr/local/bin/
 ARG --global GOCACHE=/go-cache
 
-ARG --global GOLANGCI_LINT_VERSION=v1.61.0
-
 deps:
     WORKDIR /src
     ENV GO111MODULE=on
@@ -47,12 +45,23 @@ e2e:
     RUN krewfile
     RUN krew list 2>/dev/null | grep "stern" >/dev/null
 
+vhs:
+    FROM ghcr.io/charmbracelet/vhs:v0.9.0
+    RUN apt install -y git
+    COPY +krew/krew $BINPATH
+    ENV PATH="$PATH:/root/.krew/bin"
+    COPY +build/krewfile $BINPATH
+    COPY demo.tape .
+    RUN krew install stern
+    RUN vhs demo.tape
+    SAVE ARTIFACT demo.gif AS LOCAL docs/demo.gif
+
 ###########
 # helper
 ###########
 
 golangci-lint:
-    FROM golangci/golangci-lint:$GOLANGCI_LINT_VERSION
+    FROM golangci/golangci-lint:v1.61.0
     SAVE ARTIFACT /usr/bin/golangci-lint
 
 krew:
