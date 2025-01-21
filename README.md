@@ -60,6 +60,17 @@ go install github.com/brumhard/krewfile@latest
 > for further information](https://golang.org/ref/mod#go-install). Run `go env`
 > to view your current configuration.
 
+### From releases
+
+The [releases](https://github.com/brumhard/krewfile/releases) contain build for
+Linux, Windows and MacOS as well as Linux packages.
+
+### brew
+
+```shell
+brew install brumhard/tap/krewfile
+```
+
 ### nix
 
 This repo contains a [`flake.nix`](flake.nix) file which you can use for example
