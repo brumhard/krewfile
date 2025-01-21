@@ -13,11 +13,20 @@ builds:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
+
+universal_binaries:
+  - replace: true
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
 
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
-    name_template: >-
+    name_template: &file_template >-
       {{ .ProjectName }}_
       {{- title .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
@@ -28,6 +37,27 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+
+nfpms:
+  - maintainer: Tobias Brumhard <code@brumhard.com>
+    description: &desc Declarative krew plugin management
+    homepage: &homepage https://github.com/brumhard/{{ .ProjectName }}
+    file_name_template: *file_template
+    license: &license "MIT"
+    formats:
+      - deb
+      - rpm
+      - apk
+
+brews:
+  - description: *desc
+    homepage: *homepage
+    license: *license
+    repository:
+      owner: brumhard
+      name: tap
+      # https://goreleaser.com/errors/resource-not-accessible-by-integration/#2-use-a-personal-access-token-pat-specifically-for-the-integration
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
 changelog:
   sort: asc
