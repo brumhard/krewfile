@@ -9,7 +9,7 @@ bundle)](https://github.com/Homebrew/homebrew-bundle) or
 
 ## Demo
 
-![krewfile demo](docs/term-animation.svg)
+![krewfile demo](docs/demo.gif)
 
 ## Usage
 
