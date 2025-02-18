@@ -64,7 +64,7 @@ in
     home.sessionPath = [ "${cfg.krewRoot}/bin" ];
 
     home.activation.krew = hm.dag.entryAfter [ "installPackages" ] ''
-      KREW_ROOT="${cfg.krewRoot}";
+      export KREW_ROOT="${cfg.krewRoot}";
 
       run ${finalPackage}/bin/${finalPackage.pname} \
         -command ${cfg.krewPackage}/bin/${cfg.krewPackage.pname} \
