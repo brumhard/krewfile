@@ -21,7 +21,7 @@
     }
     // flake-utils.lib.eachDefaultSystem (system: let
       name = "krewfile";
-      version = "0.6.2";
+      version = "0.6.3";
       pkgs = import nixpkgs {inherit system;};
     in rec {
       packages = {
