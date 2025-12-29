@@ -38,7 +38,7 @@ func run() error {
 		return err
 	}
 
-	var defaultKrewfileLocation string = os.Getenv("KREWFILE")
+	defaultKrewfileLocation := os.Getenv("KREWFILE")
 	if defaultKrewfileLocation == "" {
 		defaultKrewfileLocation = filepath.Join(home, ".krewfile")
 	}

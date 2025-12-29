@@ -10,7 +10,7 @@
     flake-utils,
   }:
     {
-      overlay = final: prev: {
+      overlays.default = final: prev: {
         krewfile = self.packages.${prev.stdenv.hostPlatform.system}.default;
       };
 
@@ -41,12 +41,14 @@
         };
       };
 
-      apps = {
-        default = flake-utils.lib.mkApp {
+      apps.default =
+        (flake-utils.lib.mkApp {
           drv = packages.default;
+        })
+        // {
+          meta = packages.default.meta;
         };
-      };
 
-      devShell = import ./shell.nix {inherit pkgs;};
+      devShells.default = import ./shell.nix {inherit pkgs;};
     });
 }

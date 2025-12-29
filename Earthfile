@@ -1,6 +1,6 @@
 VERSION 0.8
 
-FROM golang:1.22
+FROM golang:1.25
 ARG --global BINPATH=/usr/local/bin/
 ARG --global GOCACHE=/go-cache
 
@@ -46,8 +46,8 @@ e2e:
     RUN krew list 2>/dev/null | grep "stern" >/dev/null
 
 vhs:
-    FROM ghcr.io/charmbracelet/vhs:v0.9.0
-    RUN apt install -y git
+    FROM ghcr.io/charmbracelet/vhs:v0.10.0
+    RUN apt update --allow-releaseinfo-change && apt install -y git
     COPY +krew/krew $BINPATH
     ENV PATH="$PATH:/root/.krew/bin"
     COPY +build/krewfile $BINPATH
@@ -61,10 +61,10 @@ vhs:
 ###########
 
 golangci-lint:
-    FROM golangci/golangci-lint:v1.61.0
+    FROM golangci/golangci-lint:v2.7.2
     SAVE ARTIFACT /usr/bin/golangci-lint
 
 krew:
     FROM +deps
-    RUN go install sigs.k8s.io/krew/cmd/krew@v0.4.4
+    RUN go install sigs.k8s.io/krew/cmd/krew@v0.4.5
     SAVE ARTIFACT /go/bin/krew

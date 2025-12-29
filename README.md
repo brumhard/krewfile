@@ -38,7 +38,7 @@ that index just like you would in the krew CLI. Have look at the [krew
 docs](https://krew.sigs.k8s.io/docs/user-guide/custom-indexes/) for more info.
 
 You can also put your krewfile at any other location and point to that using the
-`-file` CLI parameter.
+`-file` CLI parameter or the `KREWFILE` env variable.
 
 Lastly, you can use the `-command` flag to overwrite the binary to call. By
 default, `krew` is used, but you might as well use `-command "kubectl krew"` to
