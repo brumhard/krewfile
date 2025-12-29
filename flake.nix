@@ -11,7 +11,7 @@
   }:
     {
       overlay = final: prev: {
-        krewfile = self.packages.${prev.system}.default;
+        krewfile = self.packages.${prev.stdenv.hostPlatform.system}.default;
       };
 
       homeManagerModules = {

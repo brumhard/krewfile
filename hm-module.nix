@@ -10,7 +10,7 @@ with lib;
 
 let
   cfg = config.programs.krewfile;
-  finalPackage = self.packages.${pkgs.system}.krewfile;
+  finalPackage = self.packages.${pkgs.stdenv.hostPlatform.system}.krewfile;
   krewfileContent = pkgs.writeText "krewfile" (
     (concatStringsSep "\n" (map (key: "index ${key} ${getAttr key cfg.indexes}") (attrNames cfg.indexes))) + "\n\n" + (concatStringsSep "\n" cfg.plugins)
   );
