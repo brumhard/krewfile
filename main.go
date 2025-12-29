@@ -38,11 +38,16 @@ func run() error {
 		return err
 	}
 
+	var defaultKrewfileLocation string = os.Getenv("KREWFILE")
+	if defaultKrewfileLocation == "" {
+		defaultKrewfileLocation = filepath.Join(home, ".krewfile")
+	}
+
 	var command string
 	var krewfileLocation string
 	var upgrade, dryRun bool
 	flag.StringVar(&command, "command", "krew", "command to be used for krew")
-	flag.StringVar(&krewfileLocation, "file", filepath.Join(home, ".krewfile"), "location of the krewfile")
+	flag.StringVar(&krewfileLocation, "file", defaultKrewfileLocation, "location of the krewfile")
 	flag.BoolVar(&upgrade, "upgrade", false, "runs krew upgrade after syncing plugins")
 	flag.BoolVar(&dryRun, "dry-run", false, "shows only output, doesn't modify anything")
 	flag.Parse()
